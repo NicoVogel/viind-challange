@@ -1,0 +1,52 @@
+type Billing {
+  # Billing Id
+  id: ID!
+
+  # Customer identification
+  customerId: String!
+
+  # Number of credits available to the customer per month
+  monthlyCredits: Int!
+
+  # credits used within one month
+  usedCredits: Int!
+
+  # additionally booked credits
+  additionalCredits: Int!
+
+  # remaining credits for this month
+  remainingCredits: Int!
+
+  # debt limit for additional credits
+  debtLimit: Int!
+}
+
+type Query {
+  billing(customerId: String!): Billing
+}
+
+type Mutation {
+  # Sets the given billing plan for the given customer.
+  setBillingPlan(setBillingInput: SetBillingInput!): Billing!
+
+  # Adds additional credits to the billing plan of the given customer.
+  addAdditionalCredits(customerId: String!, additionalCredits: Int!): Billing!
+
+  # Checks if the customer has enough credits to start a new conversation with the given user. This changes the used credits and returns true if there are enough credits available or false otherwise. If a conversation with the given user is already running, true is returned without changing the credits budget.
+  checkAvailableCredits(
+    customerId: String!
+    senderId: String!
+    inputChannel: String!
+  ): Boolean!
+}
+
+input SetBillingInput {
+  # Customer identification
+  customerId: String!
+
+  # Number of credits available to the customer per month
+  monthlyCredits: Int!
+
+  # debt limit for additional credits
+  debtLimit: Int
+}

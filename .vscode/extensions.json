@@ -9,6 +9,7 @@
     "meganrogge.template-string-converter",
     "streetsidesoftware.code-spell-checker",
     "esbenp.prettier-vscode",
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "mquandalle.graphql"
   ]
 }
