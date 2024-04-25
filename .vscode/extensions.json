@@ -10,6 +10,7 @@
     "streetsidesoftware.code-spell-checker",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
-    "mquandalle.graphql"
+    "mquandalle.graphql",
+    "GraphQL.vscode-graphql"
   ]
 }
