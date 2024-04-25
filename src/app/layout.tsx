@@ -40,7 +40,6 @@ export default function RootLayout({
           const token = "pLdY3ulLws0XboEe5Z7BNyyYWSNrGt3a";
           return {
             addAuthToOperation: (operation) => {
-              console.log("addAuthToOperation", operation);
               return utilities.appendHeaders(operation, {
                 Authorization: `Bearer ${token}`,
               });

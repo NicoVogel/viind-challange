@@ -1,7 +1,7 @@
 "use client";
 
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useQuery } from "@urql/next";
+import { useQuery, useMutation } from "@urql/next";
 import { graphql } from "gql.tada";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -29,6 +29,19 @@ const CreditBalanceQuery = graphql(`
       monthlyCredits
       usedCredits
       additionalCredits
+      remainingCredits
+      debtLimit
+    }
+  }
+`);
+
+const UpdateMonthlyCreditsMutation = graphql(`
+  mutation UpdateMonthlyCredits($input: SetBillingInput!) {
+    setBillingPlan(setBillingInput: $input) {
+      customerId
+      monthlyCredits
+      additionalCredits
+      usedCredits
       remainingCredits
       debtLimit
     }
@@ -111,6 +124,7 @@ function CustomerCreditBalance({ params }: { params: { customerId: string } }) {
           params={{
             customerId: params.customerId,
             currentMonthlyCredit: result.data.billing.monthlyCredits,
+            limit: result.data.billing.debtLimit,
           }}
         />
       </CardFooter>
@@ -121,20 +135,33 @@ function CustomerCreditBalance({ params }: { params: { customerId: string } }) {
 function EditMonthlyCredits({
   params,
 }: {
-  params: { customerId: string; currentMonthlyCredit: number };
+  params: { customerId: string; currentMonthlyCredit: number; limit: number };
 }) {
   const [open, setOpen] = useState(false);
   const [monthlyCredits, setMonthlyCredits] = useState(
     params.currentMonthlyCredit,
   );
+  const [mutation, runMutation] = useMutation(UpdateMonthlyCreditsMutation);
 
   useEffect(() => {
     setMonthlyCredits(params.currentMonthlyCredit);
   }, [params.currentMonthlyCredit, setMonthlyCredits]);
 
-  function onSubmit() {
+  async function onSubmit() {
     console.log("submit", monthlyCredits);
-    // todo: make actual request
+    const result = await runMutation({
+      input: {
+        customerId: params.customerId,
+        monthlyCredits,
+        debtLimit: params.limit,
+      },
+    });
+    if (result.error) {
+      // todo: show to user
+      console.error(result.error);
+      return;
+    }
+    // todo: show toast that it was successful
     setOpen(false);
   }
 
@@ -154,7 +181,9 @@ function EditMonthlyCredits({
           onChange={(e) => setMonthlyCredits(Number(e.target.value))}
         />
         <DialogFooter>
-          <Button onClick={onSubmit}>Save</Button>
+          <Button disabled={mutation.fetching} onClick={onSubmit}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
